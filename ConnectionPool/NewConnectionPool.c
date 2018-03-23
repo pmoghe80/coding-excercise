@@ -22,7 +22,15 @@ ConnPool_t initConnPool () {
    return conn_pool;
 }  
     
+int getConnection (ConnPool_t conn_pool) {
 
+    if (!conn_pool) {
+        printf("%s: Invalid Connection Pool", __FUNC__);
+        return 0;
+    }
+    
+    for (int i=0; i<conn_pool->num_conn; i++) {
+        if (conn
     
   
 

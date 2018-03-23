@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <queue.h>
+//#include <queue.h>
 
 
 #define MAX_POOL_SIZE     100
@@ -21,6 +21,7 @@ struct ConnectionPool {
 ConnPool_t initConnPool ();
 int putConnection (RemoteConn_t remConn);
 RemoteConn_t getConnection ();
+void getConnection ();
 int getConnectionIndex ();
 
 
