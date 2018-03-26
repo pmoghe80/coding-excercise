@@ -21,7 +21,24 @@ ConnPool_t initConnPool () {
 
    return conn_pool;
 }  
+
+int initRemoteConnection(RemoteConn_t rem_conn, int ip, int port) {
+     if (!rem_conn) {
+        printf("%s: Invalid Remote Connection\n");
+        return 0;
+     }
+     rem_conn->ip = ip;
+     rem_conn->port = port;
+     rem_conn->in_use = 0;
+     rem_conn->state = 0;
+     rem_conn->next = NULL;
+     pthread_mutex_init(&rem_conn->mux);
+     pthread_cond_init(&rem_conn->cond);
+}
     
+int reallocConnectionPool(ConnPool_t *conn_pool) {
+
+      ConnPool_t tmp_pool = (ConnPool_t)malloc(sizeof(*tmp_pool));
 RemoteConn_t getConnection (ConnPool_t conn_pool, int ip, int port) {
 
     if (!conn_pool) {
@@ -55,7 +72,7 @@ RemoteConn_t getConnection (ConnPool_t conn_pool, int ip, int port) {
            pthread_mutex_unlock(&conn_pool->mux);
            return NULL;
         }
-        initRemoteConnection(rem_conn);
+        initRemoteConnection(rem_conn, ip, port);
         conn_pool->pool[num_conn++] = rem_conn;
         pthread_mutex_unlock(&conn_pool->mux);
         return rem_conn;
@@ -63,8 +80,9 @@ RemoteConn_t getConnection (ConnPool_t conn_pool, int ip, int port) {
        reallocConnectionPool(&conn_pool);
        pthread_mutex_unlock(&conn_pool->mux);
        getConnection(conn_pool, ip, port);
-       pthread_mutex_lock(&conn_pool->mux);
     }
+
+    pthread_mutex_unlock(&conn_pool->mux);
     return NULL;
 }        
     

@@ -1,4 +1,9 @@
-#include "NewConnectionPool.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
+#define REMOTECONNECTIONHDR
 
 typedef struct RemoteConnection * RemoteConn_t;
 
