@@ -70,7 +70,8 @@ RemoteConn_t getConnection (ConnPool_t conn_pool, int ip, int port) {
     for (int i=0; i<conn_pool->num_conn; i++) {
         assert(conn_pool->pool+i);
         if ((conn_pool->pool[i])->ip == ip && 
-            conn_pool->pool[i]->port == port) {
+             conn_pool->pool[i]->port == port) {
+             printf("%s: Found connection in pool for IP %d and Port %d\n", __func__ , ip, port);
              RemoteConn_t rem_conn = conn_pool->pool[i];
              pthread_mutex_unlock(&conn_pool->mux);
              pthread_mutex_lock(&rem_conn->mux);
@@ -84,7 +85,7 @@ RemoteConn_t getConnection (ConnPool_t conn_pool, int ip, int port) {
     }
 
     if (conn_pool->num_conn < MAX_POOL_SIZE) {
-        printf("%s: Connection not found in pool, allocating\n", __func__);
+        printf("%s: Connection not found in pool for IP %d and Port %d, allocating\n", __func__, ip, port);
         RemoteConn_t * rem_conn = (RemoteConn_t *)malloc(sizeof(*rem_conn));
         if (!rem_conn) {
            printf("%s: Remote connection memory allocation failed\n", __func__);
@@ -110,10 +111,37 @@ RemoteConn_t getConnection (ConnPool_t conn_pool, int ip, int port) {
     return NULL;
 }        
     
-  
+int ReleaseConnection (ConnPool_t conn_pool, int ip, int port) {
+    if (!conn_pool) {
+        printf("%s: Invalid Connection Pool\n", __func__);
+        return 0;
+    }
+
+    for (int i=0; i < conn_pool->num_conn; i++) {
+         if (conn_pool->pool[i]->ip == ip &&
+             conn_pool->pool[i]->port == port) {
+              RemoteConn_t rem_conn = conn_pool->pool[i];
+              pthread_mutex_unlock(&conn_pool->mux);
+              pthread_mutex_lock(&rem_conn->mux);
+              rem_conn->in_use = 0;
+              pthread_mutex_unlock(&rem_conn->mux);
+              return 1;
+         }
+    }
+    printf("%s: Invalid Connection, could not find in pool\n", __func__);
+    return 0;
+}  
 
 int main() {
 
-  printf("Hello World\n");
+  ConnPool_t conn_pool = initConnPool();
+  int port = 10;
+  int ip = 100;
+
+  int i=0;
+  pthread_t thr;
+  
+  while (i<10) {
+    
   return 0;
 }
