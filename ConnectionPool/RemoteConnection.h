@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <pthread.h>
 
 #define REMOTECONNECTIONHDR
 
@@ -9,7 +9,7 @@ typedef struct RemoteConnection * RemoteConn_t;
 
 struct RemoteConnection {
     int conn_id;
-    int ip_addr;
+    int ip;
     int port;
     int state;
     int in_use;
