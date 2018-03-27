@@ -19,6 +19,12 @@ struct ConnectionPool {
      pthread_cond_t cond;
 };
 
+struct ConnectionArgs {
+   ConnPool_t conn_pool;
+   int ip;
+   int port;
+};
+
 ConnPool_t initConnPool ();
 int putConnection (RemoteConn_t remConn);
 RemoteConn_t getConnection ();

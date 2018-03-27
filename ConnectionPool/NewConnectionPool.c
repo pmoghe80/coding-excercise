@@ -132,6 +132,12 @@ int ReleaseConnection (ConnPool_t conn_pool, int ip, int port) {
     return 0;
 }  
 
+void * ConnectionThr (void *args) {
+
+    struct ConnectionArgs *conn_args = (struct ConnectionArgs *)args; 
+    getConnection(conn_args->conn_pool, conn_args->ip, conn_args->port);
+}
+
 int main() {
 
   ConnPool_t conn_pool = initConnPool();
@@ -139,9 +145,17 @@ int main() {
   int ip = 100;
 
   int i=0;
-  pthread_t thr;
   
   while (i<10) {
-    
+    pthread_t thr;
+    struct ConnectionArgs args;
+    args.conn_pool = conn_pool;
+    args.ip = ip;
+    args.port = port;
+    pthread_create(&thr, NULL, ConnectionThr, (void *)&args);
+    port = port+10;
+    ip = ip + 100;
+    i++;
+  }    
   return 0;
 }
