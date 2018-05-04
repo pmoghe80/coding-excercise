@@ -11,6 +11,13 @@
  * if a random probability calculation is less than the density. 
 
  * Compute for a set of randomly generated graphs an average shortest path.
+ 
+ RANDOM EDGE SELECTION ALGORITHM
+  1) Loop through all the vertices
+  2) For each vertex go through all the other vertex in a nested loop 
+  3) For each pair of vertices generate a random number between 0...100 (rand()%100)
+  4) If the generated number is less than "density*100" add this edge
+  5) If more then skip this edge
 *************************************************************************************************************/
 #include <iostream>
 
