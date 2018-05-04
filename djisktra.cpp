@@ -20,6 +20,7 @@
   5) If more then skip this edge
 *************************************************************************************************************/
 #include <iostream>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -45,7 +46,7 @@ class Graph {
     Graph (int vertex = 0, int edges = 0, float density = .1): num_vertex(vertex), num_edges(edges), gdensity(density) {
           adjList =  new  Gnode * [num_vertex];
           for (int i=0; i < num_vertex; i++) {
-              adjList[i] = new Gnode(i+1);
+              adjList[i] = new Gnode(i);
           }
     }
 
@@ -59,35 +60,68 @@ class Graph {
             return;
          }      
          
-         Gnode gn(v2);
+         Gnode * gn = new Gnode(v2);
          if (src_vrtx->next == NULL) {
-             cout<<"Empty, Added Edge between vertex "<< v1 <<" and vertex "<< v2 <<endl;
-             src_vrtx->next = &gn;
+             //cout<<"Empty, Added Edge between vertex "<< v1 <<" and vertex "<< v2 <<endl;
+             src_vrtx->next = gn;
+             gn->next = NULL; 
              return;
          }   
-         gn.next = src_vrtx->next;
-         src_vrtx->next = &gn;
-         cout<<"Added Edge between vertex "<< v1 <<" and vertex "<< v2 <<endl;
+         gn->next = src_vrtx->next;
+         src_vrtx->next = gn;
+         //cout<<"Added Edge between vertex "<< v1 <<" and vertex "<< v2 <<endl;
          return;
     }
+
+    void buildRandomGraph(void) {
+        for (int i=0; i<num_vertex; i++) {
+           for (int j=0; j<num_vertex; j++) {
+               if (i==j) {
+                  continue;
+               } 
+               int is_edge = (rand()%100) < (gdensity*100);
+               if (is_edge) {
+                  addEdge(i,j);
+               } 
+           }
+        }
+    }     
 
     void printGraphAttributes(void) {
       cout <<"Vertices: "<< num_vertex<<endl;
       cout<<"Edges: "<<num_edges<<endl;
       cout<<"Density: "<<gdensity<<endl;
     }
+
+    void printGraph() {
+       for (int i=0; i<num_vertex; i++) {
+           Gnode *n = adjList[i];
+           while (n) {
+              cout << n->vertex+1 <<" ";
+              n = n->next;
+           }
+           cout << endl;
+       }
+    }
 };
 
 int main() {
    Graph g1(5, 6); //= new Graph;
    Graph g2(13, 5, .2); // = new Graph(13, 5, .2);  
+   cout << "Building g1 graph"<<endl;
+   g1.buildRandomGraph();
    g1.printGraphAttributes();
+   g1.printGraph();
+   cout << endl <<endl;
+   cout << "Building g2 graph"<<endl;
    g2.printGraphAttributes();
-   g1.addEdge(1,5);
+   g2.buildRandomGraph();
+   g2.printGraph();
+   /*g1.addEdge(1,5);
    g1.addEdge(1,4);
    g1.addEdge(2,5);
    g1.addEdge(3,4);
    g1.addEdge(4,5);
-   g1.addEdge(2,3);
+   g1.addEdge(2,3);*/
    return 0;
 }      
