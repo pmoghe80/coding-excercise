@@ -1,3 +1,17 @@
+/*************************************************************************************************************
+ * Implement undirected graph using either adjacency list or matrix (comment on choice)
+
+ * Write set of constructors for declaring and initializing graph
+
+ *  Write a function to produce randomly generated set of edges with positive distances
+
+ * Random graph function should have edge density as parameter, 
+ * graph with density 0.1 would have 10% of random edges picked with random distance range. 
+ * This function should run through all possible edges (i,j) and place the edge in the graph 
+ * if a random probability calculation is less than the density. 
+
+ * Compute for a set of randomly generated graphs an average shortest path.
+*************************************************************************************************************/
 #include <iostream>
 
 using namespace std;
