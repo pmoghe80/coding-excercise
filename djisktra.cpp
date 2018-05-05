@@ -27,31 +27,46 @@ using namespace std;
 class Gnode {
   public:
    int vertex;
-   Gnode *next;
+   //Gnode *next;
    Gnode (int vertex) {
        this->vertex = vertex;
-       this->next = NULL;
+       //this->next = NULL;
    } 
 };
+
+class Edge {
+    public:
+        Gnode *src;
+        Gnode *dst;
+        Edge *next;
+        void  EdgeInit (Gnode *src, Gnode *dst, Edge *next = NULL) {
+            this->src = src;
+            this->dst = dst;
+            this->next = next;
+        }
+};   
 
 class Graph {
 
   public:
-    Gnode **adjList;
+    Edge **adjList;
+    Gnode ** nodeTable;
     const int num_vertex;
     const int num_edges;
     const float gdensity;
 
     //Constructor with default arguments and intializing const attributes
     Graph (int vertex = 0, int edges = 0, float density = .1): num_vertex(vertex), num_edges(edges), gdensity(density) {
-          adjList =  new  Gnode * [num_vertex];
+          adjList =  new  Edge * [num_vertex];
+          nodeTable = new Gnode * [num_vertex];
           for (int i=0; i < num_vertex; i++) {
-              adjList[i] = new Gnode(i);
+              adjList[i] = NULL;
+              nodeTable[i] = new Gnode(i);
           }
     }
 
     void addEdge (int v1, int v2) {
-         Gnode *src_vrtx = adjList[v1];
+         Gnode *src_vrtx = nodeTable[v1];
          if (!src_vrtx) {
             cout<<"Invalid source vertex index"<<endl;
             return;
@@ -60,16 +75,15 @@ class Graph {
             return;
          }      
          
-         Gnode * gn = new Gnode(v2);
-         if (src_vrtx->next == NULL) {
-             //cout<<"Empty, Added Edge between vertex "<< v1 <<" and vertex "<< v2 <<endl;
-             src_vrtx->next = gn;
-             gn->next = NULL; 
-             return;
-         }   
-         gn->next = src_vrtx->next;
-         src_vrtx->next = gn;
-         //cout<<"Added Edge between vertex "<< v1 <<" and vertex "<< v2 <<endl;
+         Gnode * gn = nodeTable[v2];
+         Edge *edg = new Edge;
+         if (!adjList[v1]) {
+             adjList[v1] = edg;
+             edg->EdgeInit(src_vrtx, gn, adjList[v1]->next); 
+             return;   
+         }    
+         edg->EdgeInit(src_vrtx, gn, adjList[v1]->next); 
+         adjList[v1]->next = edg;
          return;
     }
 
@@ -95,9 +109,9 @@ class Graph {
 
     void printGraph() {
        for (int i=0; i<num_vertex; i++) {
-           Gnode *n = adjList[i];
+           Edge *n = adjList[i];
            while (n) {
-              cout << n->vertex+1 <<" ";
+              cout << n->src->vertex+1 <<" ";
               n = n->next;
            }
            cout << endl;
@@ -106,7 +120,7 @@ class Graph {
 };
 
 int main() {
-   Graph g1(5, 6); //= new Graph;
+   Graph g1(15, 6); //= new Graph;
    Graph g2(13, 5, .2); // = new Graph(13, 5, .2);  
    cout << "Building g1 graph"<<endl;
    g1.buildRandomGraph();
