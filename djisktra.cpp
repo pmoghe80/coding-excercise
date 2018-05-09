@@ -39,6 +39,7 @@ class Edge {
         Gnode *src;
         Gnode *dst;
         Edge *next;
+         
         void  EdgeInit (Gnode *src, Gnode *dst, Edge *next = NULL) {
             this->src = src;
             this->dst = dst;
