@@ -30,12 +30,15 @@ using namespace std;
 template <typename T>
 class PriorityQueue {
    private:
-      vector <T> pqueue;
+      T pqueue[MAX_PQ];
       int pqsz;
   public:
      /*inline*/ int ParentIndx(int x) { return x/2;}
      /*inline*/ int LChildIndx(int x) { return 2*x; }
      /*inline*/ int RChildIndx(int x) { return 2*x + 1;}
+     PriorityQueue() {
+          pqsz=0;
+     }
      T ExtractMax();
      void ShiftUp (int x); 
      void ShiftDown (int x);
@@ -64,6 +67,9 @@ void PriorityQueue<T>::ShiftUp(int x) {
 template <class T>
 void PriorityQueue<T>::ShiftDown(int x) {
    int maxindx = x;
+   if (pqsz < LChildIndx(x)) {
+      return;
+   }
    if (pqueue[maxindx] > pqueue[LChildIndx(x)]) {
       maxindx = LChildIndx(x);
    }
@@ -74,8 +80,9 @@ void PriorityQueue<T>::ShiftDown(int x) {
 
    if (x != maxindx) {
       Swap(pqueue[x], pqueue[maxindx]);
+      ShiftDown(maxindx);           
    }
-   ShiftDown(maxindx);           
+   
 }
 
 template <class T>
@@ -84,8 +91,13 @@ void PriorityQueue<T>::pqadd(T item) {
         cout << "Queue Full" << endl;
         return;
      }
+
+     if (pqsz == 0) {
+        pqueue[0] = NULL;
+     }
      pqsz = pqsz + 1;
      pqueue[pqsz] = item;
+     //pqueue.push_back(item);
      ShiftUp(pqsz); 
 }
 
@@ -156,6 +168,37 @@ class Gnode {
        //this->next = NULL;
        visited = false;
    } 
+        bool operator >(const Gnode &gn) {
+            if (weight > gn.weight) {
+                return true;
+            } else {
+                return false;
+            }
+        }    
+
+        bool operator <(const Gnode &gn) {
+            if (weight < gn.weight) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        bool operator >=(const Gnode &gn) {
+            if (weight >= gn.weight) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        bool operator <=(const Gnode &gn) {
+            if (weight <= gn.weight) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 };
 
 class Edge {
@@ -271,6 +314,7 @@ class Graph {
          
          Gnode * gn = nodeTable[v2];
          Edge *edg = new Edge;
+         edg->next = NULL;
          if (!adjList[v1]) {
              adjList[v1] = edg;
              edg->EdgeInit(src_vrtx, gn, wt, adjList[v1]->next); 
@@ -306,55 +350,92 @@ class Graph {
     void printGraph() {
        for (int i=0; i<num_vertex; i++) {
            Edge *n = adjList[i];
+           while (!n) {
+             n = adjList[++i];
+           }
+           cout << n->src->vertex+1 <<" ";
            while (n) {
-              cout << n->src->vertex+1 <<" ";
+              
+              cout << n->dst->vertex+1 <<" ";
               n = n->next;
            }
            cout << endl;
        }
     }
-
-    //Edge * getEdge
+    Gnode * getNode (int u) {
+         return nodeTable[u];
+    }
 };
 
-class ShortestPath: public Graph {
+class ShortestPath {
     private:
        int cost;
        PriorityQueue<Gnode *> pq;
-       vector<Edge *> path;
+       vector<Gnode *> path;
+       Graph *gp;  
     public:
+       ShortestPath(Graph *g): gp(g) {
+       }
        void Path(int u, int v);
+       void PrintShortestPath(void);
 };
 
 void ShortestPath::Path (int u, int v) {
-      Gnode *src = nodeTable[u];
-      Gnode *dst = nodeTable[v];
-      
+      Gnode *src = gp->getNode(u);
+      Gnode *dst = gp->getNode(v);
+      Gnode *curr;
+ 
       src->weight = 0;
-      Edge * src_edg = adjList[u];
-      
-      Edge * tmp_edg = src_edg;
-      path.push_back(src_edg);
-      while (tmp_edg) {
-          if (tmp_edg->dst) 
-          tmp_edg->dst->weight = src_edg->weight + src->weight;
-          pq.pqadd(tmp_edg->dst);
+      src->visited = false;
+      curr =  src;
+      while (curr && curr != dst) {
+          Edge * src_edg = gp->adjList[curr->vertex];
+          Edge * tmp_edg = src_edg;
 
-      }    
+          path.push_back(curr);
+          while (tmp_edg) {
+              if (tmp_edg->dst && tmp_edg->dst->visited) {
+                  continue;
+              }
+              int tmp_wt = src_edg->weight + curr->weight;
+              if (tmp_edg->dst->weight < tmp_wt) { 
+                  tmp_edg->dst->weight = tmp_wt;
+              }
+              pq.pqadd(tmp_edg->dst);
+              tmp_edg = tmp_edg->next;
+          }   
+          curr->visited = true; 
+          curr = pq.ExtractMin();
+      }
+      if (curr == dst) {
+         path.push_back(curr);
+      }
 }
+
+void ShortestPath::PrintShortestPath() {
+     for (int i=0; i < path.size(); i++) {
+         cout << path[i]->vertex << " " ;
+     }
+     cout <<endl;
+}
+
 
 int main() {
    Graph g1(15, 6); //= new Graph;
-   Graph g2(13, 5, .2); // = new Graph(13, 5, .2);  
+   //Graph g2(13, 5, .2); // = new Graph(13, 5, .2);  
+   ShortestPath sp(&g1);
    cout << "Building g1 graph"<<endl;
    g1.buildRandomGraph();
    g1.printGraphAttributes();
    g1.printGraph();
    cout << endl <<endl;
-   cout << "Building g2 graph"<<endl;
-   g2.printGraphAttributes();
-   g2.buildRandomGraph();
-   g2.printGraph();
+   cout << "Shortest Path" << endl;
+   sp.Path(2,9);
+   sp.PrintShortestPath();
+   //cout << "Building g2 graph"<<endl;
+   //g2.printGraphAttributes();
+   //g2.buildRandomGraph();
+   //g2.printGraph();
    /*g1.addEdge(1,5);
    g1.addEdge(1,4);
    g1.addEdge(2,5);
