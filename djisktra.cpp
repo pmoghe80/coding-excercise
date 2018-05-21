@@ -367,6 +367,67 @@ class Graph {
     }
 };
 
+template <class T>
+class Stack {
+    private:
+        T ** st;
+        int top;
+        const int max_stack;
+    public:
+
+      Stack (int sz): max_stack(sz) {
+          st = new T * [sz];
+          top = -1;
+          
+      }
+
+      bool Push (T * item) {
+          if ((top+1) >= max_stack) {
+             cout << "Stack Full"<<endl;
+             return false;
+          }
+          st[++top] = item;
+      }
+
+      T * Pop() {
+        if (top < 0) {
+           cout << "Stack Empty"<<endl;
+           return NULL;
+        }
+        return st[top--];
+      }
+}
+
+template <class T>
+class Queue {
+    private:
+        T * front;
+        T * rear;
+    public:
+
+        Queue() {
+            front = NULL;
+            rear = NULL;
+        }
+
+        void addQueue (T *item) {
+            if (!rear) {
+                rear = item;
+                item->qnxt = NULL;
+                return;
+            } else {
+                rear->next = item;
+                item->next = NULL;
+                rear = item;
+            }
+        }
+
+        
+
+ 
+          
+class Traverse {
+     
 class ShortestPath {
     private:
        int cost;
