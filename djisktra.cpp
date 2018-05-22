@@ -396,7 +396,7 @@ class Stack {
         }
         return st[top--];
       }
-}
+};
 
 template <class T>
 class Queue {
@@ -416,17 +416,33 @@ class Queue {
                 item->qnxt = NULL;
                 return;
             } else {
-                rear->next = item;
-                item->next = NULL;
+                rear->qnxt = item;
+                item->qnxt = NULL;
                 rear = item;
             }
         }
 
-        
+        T * removeQueue() {
+            T * tmp = front;
+            front = front->qnxt;
+            return tmp;
+        }
 
- 
-          
+        T * peekQueue() {
+            return front;
+        }
+};
+        
 class Traverse {
+    private:
+        int *marked;
+        const Graph *gp; 
+    public:
+        Traverse(int num_vertex, Graph *g): gp(g) {
+            marked = new int[num_vertex]; 
+        }  
+
+};         
      
 class ShortestPath {
     private:
