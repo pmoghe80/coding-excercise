@@ -431,12 +431,22 @@ class Queue {
         T * peekQueue() {
             return front;
         }
+
+        bool emptyQueue() {
+           if (!front && !rear) {
+               return true;
+           } else {
+               return false;
+           }
+        }  
 };
         
 class Traverse {
     private:
         bool *marked;
         const Graph *gp; 
+        Queue<Gnode *> edgQueue;
+
     public:
         Traverse(int num_vertex, Graph *g): gp(g) {
             marked = new bool[num_vertex]; 
@@ -457,8 +467,25 @@ class Traverse {
                  DFS(dst->vertex);
                  edg = edg->next;    
             } 
-        }  
+        } 
 
+        void BFS (int v) {
+            Edge *edg = gp->adjList[v];
+            edgQueue.addQueue(edg->src);
+            while (!edgQueue.emptyQueue()) {
+                Gnode *tmp = edgQueue.removeQueue();
+                edg = gp->adjList[tmp->vertex];
+                if (marked[tmp->vertex]) {
+                   continue;
+                }    
+                while (edg) {
+                    edgQueue.addQueue(edg->dst);
+                    edg = edg->next;
+                }
+                marked[v] = true;
+            }
+        }    
+                 
 };         
      
 class ShortestPath {
