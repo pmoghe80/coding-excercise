@@ -435,11 +435,28 @@ class Queue {
         
 class Traverse {
     private:
-        int *marked;
+        bool *marked;
         const Graph *gp; 
     public:
         Traverse(int num_vertex, Graph *g): gp(g) {
-            marked = new int[num_vertex]; 
+            marked = new bool[num_vertex]; 
+            int i=0;
+            while (i < num_vertex) {
+                marked[i] = false;
+            }
+        }
+
+        void DFS(int v) {
+            if (marked[v]) {
+               return;
+            }
+            marked[v] = true;
+            Edge *edg = gp->adjList[v];
+            while (edg) {
+                 Gnode * dst = edg->dst;
+                 DFS(dst->vertex);
+                 edg = edg->next;    
+            } 
         }  
 
 };         
