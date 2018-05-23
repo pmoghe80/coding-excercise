@@ -162,7 +162,7 @@ class Gnode {
    int vertex;
    bool visited;
    int weight;
-
+   Gnode *qnxt;
    Gnode (int vertex) {
        this->vertex = vertex;
        //this->next = NULL;
@@ -353,10 +353,10 @@ class Graph {
            while (!n) {
              n = adjList[++i];
            }
-           cout << n->src->vertex+1 <<" ";
+           cout << n->src->vertex <<" ";
            while (n) {
               
-              cout << n->dst->vertex+1 <<" ";
+              cout << n->dst->vertex <<" ";
               n = n->next;
            }
            cout << endl;
@@ -401,35 +401,13 @@ class Stack {
 template <class T>
 class Queue {
     private:
-        T * front;
-        T * rear;
+        T  front;
+        T  rear;
     public:
 
         Queue() {
             front = NULL;
             rear = NULL;
-        }
-
-        void addQueue (T *item) {
-            if (!rear) {
-                rear = item;
-                item->qnxt = NULL;
-                return;
-            } else {
-                rear->qnxt = item;
-                item->qnxt = NULL;
-                rear = item;
-            }
-        }
-
-        T * removeQueue() {
-            T * tmp = front;
-            front = front->qnxt;
-            return tmp;
-        }
-
-        T * peekQueue() {
-            return front;
         }
 
         bool emptyQueue() {
@@ -439,20 +417,49 @@ class Queue {
                return false;
            }
         }  
+
+        void addQueue (T item) {
+            if (emptyQueue()) {
+                rear = item;
+                front = item;
+                item->qnxt = NULL;
+                return;
+            } else {
+                rear->qnxt = item;
+                item->qnxt = NULL;
+                rear = item;
+            }
+        }
+
+        T  removeQueue() {
+            T  tmp = front;
+            front = front->qnxt;
+            if (!front) {
+                rear = front;
+            }
+            return tmp;
+        }
+
+        T  peekQueue() {
+            return front;
+        }
 };
         
 class Traverse {
     private:
         bool *marked;
-        const Graph *gp; 
+        bool *bfs_marked;
+         Graph *gp; 
         Queue<Gnode *> edgQueue;
 
     public:
         Traverse(int num_vertex, Graph *g): gp(g) {
             marked = new bool[num_vertex]; 
+            bfs_marked = new bool[num_vertex]; 
             int i=0;
             while (i < num_vertex) {
-                marked[i] = false;
+                marked[i++] = false;
+                bfs_marked[i++] = false;
             }
         }
 
@@ -460,30 +467,40 @@ class Traverse {
             if (marked[v]) {
                return;
             }
-            marked[v] = true;
             Edge *edg = gp->adjList[v];
+            if (edg && !marked[v]) {      
+                cout << edg->src->vertex << " ";
+            }
+            marked[v] = true;
             while (edg) {
                  Gnode * dst = edg->dst;
-                 DFS(dst->vertex);
+                 if (!marked[dst->vertex]) {
+                     DFS(dst->vertex);
+                     //cout << dst->vertex << " ";
+                 }
                  edg = edg->next;    
             } 
         } 
 
         void BFS (int v) {
-            Edge *edg = gp->adjList[v];
-            edgQueue.addQueue(edg->src);
+            Gnode * gn = gp->getNode(v);
+            edgQueue.addQueue(gn);
             while (!edgQueue.emptyQueue()) {
                 Gnode *tmp = edgQueue.removeQueue();
-                edg = gp->adjList[tmp->vertex];
-                if (marked[tmp->vertex]) {
+                Edge *edg = gp->adjList[tmp->vertex];
+                cout << tmp->vertex << " ";
+                if (bfs_marked[tmp->vertex]) {
                    continue;
-                }    
+                }  
+                      
                 while (edg) {
+                    cout << edg->dst->vertex << " ";
                     edgQueue.addQueue(edg->dst);
                     edg = edg->next;
                 }
-                marked[v] = true;
+                bfs_marked[tmp->vertex] = true;
             }
+            cout << endl;
         }    
                  
 };         
@@ -553,6 +570,11 @@ int main() {
    cout << "Shortest Path" << endl;
    sp.Path(2,9);
    sp.PrintShortestPath();
+   Traverse tr(15, &g1);
+   cout << endl << "Depth First Search Traversal" << endl;
+   tr.DFS(2);
+   cout << endl << "Breadth First Search Traversal" << endl;
+   tr.BFS(2);
    //cout << "Building g2 graph"<<endl;
    //g2.printGraphAttributes();
    //g2.buildRandomGraph();
