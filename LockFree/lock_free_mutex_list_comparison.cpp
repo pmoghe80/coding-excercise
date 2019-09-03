@@ -58,7 +58,7 @@ int main() {
     //gettimeofday(&start_tv, NULL);
     //start = tv.tv_sec;
     //start_usec = tv.tv_usec; 
-    while (i < 10000) {
+    /*while (i < 10000) {
          arr[i] = i;
          pthread_create(&apt[i], NULL, AtomicAddNode, (void *)&arr[i]);
          i++;
@@ -66,7 +66,7 @@ int main() {
      
     for (i=0; i<10000; i++) {
          pthread_join(apt[i], NULL);
-    } 
+    } */
 
     //gettimeofday(&end_tv, NULL); 
     //end = tv.tv_sec;
