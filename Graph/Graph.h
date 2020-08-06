@@ -9,6 +9,10 @@
 
 using namespace std;
 
+struct Node {
+   int v;
+};
+
 class Graph {
    public:	
 	Graph(int vrt): v(vrt) {
